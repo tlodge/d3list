@@ -6,7 +6,9 @@ define(['jquery','d3'], function($,d3){
 		
 		rectmargin = 30,
 		
-		pointerwidth = 35,
+		pointerwidth = 55,
+		
+		pointerpadding = [60,0,10,50,60],
 		
 		transitionduration = 1000,
 		
@@ -14,8 +16,9 @@ define(['jquery','d3'], function($,d3){
 		
 		commentwidth = 500,
 		
-		bubble	  = "m 18.418412,1381.8075 c -15.7000089,-28.5466 -5.803644,-62.6496 -15.7324574,-92.5686 -9.2081987,-15.247 -30.4228406,-16.8556 -42.6777366,-29.6819 -29.188275,-21.7923 -53.638677,-57.5686 -45.845838,-95.5559 10.182922,-51.654 55.287738,-87.6765 100.676508,-108.9 69.391733,-32.8801 154.693092,-32.6558 222.822722,3.3353 38.7899,21.1304 73.46742,62.4924 67.87439,109.1353 -6.43574,47.1 -46.60247,82.1761 -89.29953,97.9435 -44.49651,17.7094 -91.87957,27.0604 -139.310352,32.4503 -35.869542,9.2718 -57.405943,48.8325 -58.507706,83.842 z",
-         
+		largebubble	  	= "m 18.418412,1381.8075 c -15.7000089,-28.5466 -5.803644,-62.6496 -15.7324574,-92.5686 -9.2081987,-15.247 -30.4228406,-16.8556 -42.6777366,-29.6819 -29.188275,-21.7923 -53.638677,-57.5686 -45.845838,-95.5559 10.182922,-51.654 55.287738,-87.6765 100.676508,-108.9 69.391733,-32.8801 154.693092,-32.6558 222.822722,3.3353 38.7899,21.1304 73.46742,62.4924 67.87439,109.1353 -6.43574,47.1 -46.60247,82.1761 -89.29953,97.9435 -44.49651,17.7094 -91.87957,27.0604 -139.310352,32.4503 -35.869542,9.2718 -57.405943,48.8325 -58.507706,83.842 z",
+        smallbubble	= "m 433.84398,1212.9876 c 10.87312,-25.4968 -6.52217,-47.7724 11.26563,-56.3796 17.78776,-8.6072 62.30363,-42.7121 48.06646,-83.7428 -14.23712,-41.0306 -69.11472,-68.6351 -124.69494,-76.91352 -55.58028,-8.27847 -132.67227,7.48782 -165.65162,51.77382 -32.97945,44.2859 -5.85204,83.1973 32.09977,103.5921 37.29425,20.0413 111.28325,25.1469 141.78218,24.5249 30.49902,-0.6219 52.83522,12.7275 57.13252,37.1451 z",
+       
 	  	
 		colours		 = ["#880e4f","#c2185b", "#e91e63", "#f06292", "#f8bbd0"],
 		
@@ -27,7 +30,7 @@ define(['jquery','d3'], function($,d3){
 				  
 		margin    = {top:20, right:pointerwidth+10, bottom:20,left:35},
 		
-		width 	  = 300 - margin.left - margin.right,
+		width 	  = 400 - margin.left - margin.right,
 		
 	  	height    = 450 - margin.top - margin.bottom,
 		
@@ -45,6 +48,11 @@ define(['jquery','d3'], function($,d3){
 	  	
 	  	cy = function(position){
 	  		return ((position - 1) * (height/mydata.length)) + ((height/mydata.length) / 2) - rectmargin/2;
+	  	},
+	  	
+	  	cx = function(position){
+	  		console.log("padding is " + pointerpadding[position-1]);
+	  		return width + pointerwidth + pointerpadding[position-1] - ((height/mydata.length) / 2);
 	  	},
 	  
 	  	calcpos = function(ypos){
@@ -152,13 +160,8 @@ define(['jquery','d3'], function($,d3){
 					.transition()
 					.duration(transitionduration)
 					.attr("cy", cy(newpos))
-		
-			neighbourcontainer.select("g")
-					.select("line")
-					.transition()
-					.duration(transitionduration)
-					.attr("y1", cy(newpos))
-					.attr("y2", cy(newpos))	
+					
+			
 
 	  	},
 	  	
@@ -199,7 +202,9 @@ define(['jquery','d3'], function($,d3){
 	  		
 	  		draggedcontainer.select("g").selectAll("circle")
 	  			.attr("cy", function(d){return Math.min(maxheight+vcenter,
-	  													Math.max(vcenter, d3.event.y + vcenter))});
+	  													Math.max(vcenter, d3.event.y + vcenter))})
+	  			.attr("cx", d.x = cx(mydata[currentpos].position))
+	  		
 	  		
 	  		draggedcontainer.select("g").selectAll("line")
 	  			
@@ -207,7 +212,9 @@ define(['jquery','d3'], function($,d3){
 	  										    		Math.max(vcenter, d3.event.y + vcenter))})
 	  			
 	  			.attr("y2", function(d){return Math.min(maxheight + vcenter,
-	  										    		Math.max(vcenter, d3.event.y + vcenter))});							  	
+	  										    		Math.max(vcenter, d3.event.y + vcenter))})
+	  			
+	  			.attr("x2", cx(mydata[currentpos].position))					  	
 	  			
 			draggedcontainer.select("text")
 				.attr("y", function(d){return Math.min(maxheight+vcenter,
@@ -268,14 +275,26 @@ define(['jquery','d3'], function($,d3){
 	   	drag = d3.behavior.drag().on("dragstart", dragstart).on("drag", dragit).on("dragend", dragend),
 	   	
 	   	renderbubble = function(){
-	   		console.log("rendering bubble! -->");
+	   		
     		var comment1 = svg
     						.append("g")
     						.attr("transform", "translate(" + (89.714286 + bubblemargin.left) + ", -1030.0007)")
     			
     			comment1
     						.append("path")
-    						.attr("d", bubble)
+    						.attr("d", largebubble)
+    					  	.style("stroke-width", 10)
+    					  	.style("stroke", "#262238")
+    					  	.style("fill", colour(0))
+    		
+    		
+    		var comment2 = svg
+    						.append("g")
+    						.attr("transform", "translate(" + (-181, + bubblemargin.left) + ", -830)")
+    			
+    			comment2
+    						.append("path")
+    						.attr("d", smallbubble)
     					  	.style("stroke-width", 10)
     					  	.style("stroke", "#262238")
     					  	.style("fill", colour(0))
@@ -352,7 +371,7 @@ define(['jquery','d3'], function($,d3){
 	  		
 	  		pointer.append("circle")
 	  			.attr("class", "outer")
-	  			.attr("cx", function(d){return width + pointerwidth - (itemheight / 2) })
+	  			.attr("cx", function(d){return cx(d.position)})//return width + pointerwidth - (itemheight / 2) })
 	  			.attr("cy", function(d){return cy(d.position)})
 	  			.attr("r", function(d){return ((height/mydata.length) / 2)})
 	  			.style("fill", "#262238")
@@ -363,7 +382,7 @@ define(['jquery','d3'], function($,d3){
 	  			
 	  		pointer.append("circle")
 	  			.attr("class", "inner")
-	  			.attr("cx", function(d){return width + pointerwidth - ((height/mydata.length) / 2) })
+	  			.attr("cx", function(d){return cx(d.position)})//width + pointerwidth - ((height/mydata.length) / 2) })
 	  			.attr("cy", function(d){return cy(d.position)})
 	  			.attr("r", function(d){return ((height/mydata.length) / 4)})
 	  			.style("fill", function(d){return colour(d.position - 1)})
@@ -376,7 +395,7 @@ define(['jquery','d3'], function($,d3){
 	  			.attr("y1", function(d){return cy(d.position)})
 				.attr("x1", function(d){return width - pointerwidth})
 				.attr("y2", function(d){return cy(d.position)})
-				.attr("x2", function(d){return width + pointerwidth - (itemheight / 2) })
+				.attr("x2", function(d){return cx(d.position)  })
 	  			.style("stroke", function(d){return colour(d.position - 1)})
 	  			.style("stroke-width", 3)
 	  			.style("stroke-opacity", 0.0)
