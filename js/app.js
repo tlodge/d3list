@@ -11,6 +11,7 @@ require.config({
     }
 });
 
-require(['d3list'], function(d3list) {
+require(['d3list', 'd3comments'], function(d3list, d3comments) {
   d3list.init();
+  //d3comments.init();
 });
