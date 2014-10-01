@@ -141,13 +141,20 @@ define(['jquery','d3'], function($,d3){
 					.style("fill", "#fff")
 					.style("stroke",function(d){return colour(newpos-1)})
 		
-			neighbourcontainer.select("text")
+			neighbourcontainer.select("text.rank")
 					.transition()
 					.duration(transitionduration)
 					.attr("y", function(d){return cy(newpos)})
 					.attr("font-size", function(d){return multiplier(newpos) * 35 + "px"})	
 					.text(function(d){return newpos})
-				
+			
+			neighbourcontainer.select("text.label")
+					.transition()
+					.duration(transitionduration)
+					.attr("y", function(d){return cy(newpos)})
+					.attr("font-size", function(d){return multiplier(newpos) * 35 + "px"})	
+					.text(function(d){return d.value})
+						
 			neighbourcontainer.select("rect")
 					.transition()
 					.duration(transitionduration)
@@ -216,10 +223,14 @@ define(['jquery','d3'], function($,d3){
 	  			
 	  			.attr("x2", cx(mydata[currentpos].position))					  	
 	  			
-			draggedcontainer.select("text")
+			draggedcontainer.select("text.rank")
 				.attr("y", function(d){return Math.min(maxheight+vcenter,
 	  													Math.max(vcenter, d3.event.y + vcenter))})
 	  			.text(function(d){return mydata[currentpos].position})
+	  		
+	  		draggedcontainer.select("text.label")
+				.attr("y", function(d){return Math.min(maxheight+vcenter,
+	  													Math.max(vcenter, d3.event.y + vcenter))})
 
 	   	},
 	   			
@@ -247,10 +258,10 @@ define(['jquery','d3'], function($,d3){
 	  				.style("fill", "#fff")
 	  				.style("stroke",function(d){return colour(d.position - 1)})
 	  		
-	  		draggedcontainer.select("text")
+	  		draggedcontainer.selectAll("text")
 				.attr("y", function(d){return cy(mydata[currentpos].position)})
 	  			.attr("font-size", function(d){return multiplier(currentpos) * 35 + "px"})	
-	  		//	.text(function(d){return mydata[currentpos].position})
+	  		
 	  		
 	  		var pointer   = draggedcontainer.select("g");
 	  		
@@ -327,8 +338,20 @@ define(['jquery','d3'], function($,d3){
 	  			.style("fill-opacity", 1.0)	
 				.style("stroke-opacity", 1.0)
 				.call(drag)	
-	  
+	  		
+	  		
 	  			
+	  		container
+	  			.append("text")
+	  			.attr("class", "label")
+	  			.attr("text-anchor", "middle")
+	  			.attr("fill", "white")
+	  			.attr("y", function(d){return cy(d.position)})
+	  			.attr("x", function(d){return (width-pointerwidth)/2})
+	  			.attr("dy", ".3em")
+	  			.attr("font-size", function(d){return multiplier(d.position-1) * 35 + "px"})
+	  			.text(function(d){return d.value})
+	  			  			
 	  		container
 	  			.append("circle")
 	  			.attr("class", "ranking outer")
@@ -355,6 +378,8 @@ define(['jquery','d3'], function($,d3){
 						.style("stroke-opacity", 1.0)
 						.call(drag)	
 	  		
+	  		
+	  			
 	  		container
 	  			.append("text")
 	  			.attr("class", "rank")
