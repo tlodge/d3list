@@ -2,7 +2,9 @@
 <html class="no-js" lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>d3 list</title>
   </head>
   <body>
@@ -14,6 +16,26 @@
   			 font-family: "Helvetica Neue",Helvetica,"Myriad Pro","Lucida Grande",sans-serif;
   			
   		}
+  	    
+  	    .comment{
+  	    	letter-spacing: 13;
+  	    	font-family: "Helvetica Neue",Helvetica,"Myriad Pro","Lucida Grande",sans-serif;
+  	    	font-size: 20px;
+  	    }
+  	    /*.comment{
+  		 	font-family: "Helvetica Neue",Helvetica,"Myriad Pro","Lucida Grande",sans-serif;
+  		 	color: white;
+  		 	font-size: 130%;
+  		 	text-align: center;
+  		 	height: 120px;
+  		 	line-height: 120px;
+  		}
+  		
+  		span{
+  			display:inline-block;
+  			vertical-align: middle;
+  			line-height: 24px;
+  		}*/
   	</style>
   	<div id="list" style="float:left"></div>
     <script data-main="js/app.js" src="js/require/require.js"></script>
