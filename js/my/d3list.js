@@ -10,6 +10,7 @@ define(['jquery','d3'], function($,d3){
 		
 		pointerwidth = 55,
 		
+		rankwidth 	= 30,
 		pointerpadding = [40,-20,-15,50,70],
 		
 		transitionduration = 300,
@@ -53,9 +54,10 @@ define(['jquery','d3'], function($,d3){
 	  	rectoffset = (height/mydata.length),
 	  	
 	  	cy = function(position){
-	  		return ((position - 1) * (height/mydata.length)) + ((height/mydata.length) / 2) - rectmargin/2;
+	  		return ((position - 1) * (height/mydata.length)) + ((height/mydata.length)/2);
 	  	},
 	  	
+	  
 	  	cx = function(position){
 	  		
 	  		return width + pointerwidth + pointerpadding[position-1] - ((height/mydata.length) / 2);
@@ -74,7 +76,7 @@ define(['jquery','d3'], function($,d3){
 	  	},
 	  	
 	  	multiplier = function(ypos){
-	  		return 0.7 + (0.3 * (1 - (ypos/mydata.length)));
+	  		return 1;//0.7 + (0.3 * (1 - (ypos/mydata.length)));
 	  	},
 	  	
 	  	dragstart = function(d){
@@ -95,7 +97,7 @@ define(['jquery','d3'], function($,d3){
 	  		//make any previously selected pointers transparent
 	  		var listitems = d3.selectAll("g.listitem");
 	  		
-	  		var pointers = listitems.selectAll("g")
+	  		/*var pointers = listitems.selectAll("g")
 	  		
 	  		pointers.selectAll("circle")
 	  			.style("stroke-opacity", 0.0)	
@@ -117,7 +119,7 @@ define(['jquery','d3'], function($,d3){
 	  			.style("fill-opacity", 1.0)	
 	  			
 	  		pointer.selectAll("line")
-	  			.style("stroke-opacity", 1.0)	
+	  			.style("stroke-opacity", 1.0)	*/
 	  			
 	  	},
 	  	
@@ -145,32 +147,40 @@ define(['jquery','d3'], function($,d3){
 			//individually set the x and y coords.  this is much easier than translating the g container
 			//as then would need to subsequently offset by whatever translated to.
 			
-			neighbourcontainer.select("circle.outer")
+			/*neighbourcontainer.select("circle.outer")
 					.transition()
 					.duration(transitionduration)
 					.attr("r", multiplier(newpos) * ((height/mydata.length) / 2) - 4)
-					.attr("cy", cy(newpos))
+					.attr("cy", cy(newpos))*/
 				
-			neighbourcontainer.select("circle.inner")
+			/*neighbourcontainer.select("circle.inner")
 					.transition()
 					.duration(transitionduration)
 					.attr("r", multiplier(newpos) * ((height/mydata.length) / 2) - 7)
 					.attr("cy", cy(newpos))
 					.style("fill", "#fff")
-					.style("stroke",function(d){return colour(newpos-1)})
+					.style("stroke",function(d){return colour(newpos-1)})*/
+					
+			neighbourcontainer.select("circle")
+					.transition()
+					.duration(transitionduration)
+					//.attr("r", rankwidth)
+					.attr("cy", cy(newpos))
+					//.style("fill", "#fff")
+					//.style("stroke",function(d){return colour(newpos-1)})
 		
 			neighbourcontainer.select("text.rank")
 					.transition()
 					.duration(transitionduration)
 					.attr("y", cy(newpos))
-					.attr("font-size", multiplier(newpos) * 35 + "px")	
+					.attr("font-size", multiplier(newpos) * rankwidth + "px")	
 					.text(function(d){return newpos})
 			
 			neighbourcontainer.select("text.label")
 					.transition()
 					.duration(transitionduration)
 					.attr("y", cy(newpos))
-					.attr("font-size", multiplier(newpos) * 35 + "px")	
+					.attr("font-size", multiplier(newpos) * rankwidth + "px")	
 					.text(function(d){return d.value})
 						
 			neighbourcontainer.select("rect")
@@ -245,36 +255,36 @@ define(['jquery','d3'], function($,d3){
 	  				.style("fill", colour(currentpos))
 	  				.style("stroke", colour(currentpos));
 	  		
-	  	    draggedcontainer.selectAll("circle.ranking")
-	  				.attr("cy", cy(mydata[currentpos].position))
-	  				
-	  		draggedcontainer.select("circle.outer")
+	  	    draggedcontainer.select("circle")
+	  				.attr("cy", function(d){return cy(mydata[currentpos].position)})
+	  		/*draggedcontainer.select("circle.outer")
 	  				.attr("r", multiplier(mydata[currentpos].position) * ((height/mydata.length) / 2) - 4)
 	  				
 	  				
 	  		draggedcontainer.select("circle.inner")
 	  				.attr("r", multiplier(mydata[currentpos].position) * ((height/mydata.length) / 2) - 7)
 	  				.style("fill", "#fff")
-	  				.style("stroke",function(d){return colour(d.position - 1)})
+	  				.style("stroke",function(d){return colour(d.position - 1)})*/
 	  		
 	  		draggedcontainer.selectAll("text")
 				.attr("y", function(d){return cy(mydata[currentpos].position)})
-	  			.attr("font-size", function(d){return multiplier(currentpos) * 35 + "px"})	
+				
+	  			//.attr("font-size", function(d){return multiplier(currentpos) * rankwidth + "px"})	
 	  		
 	  		
 	  		var pointer   = draggedcontainer.select("g");
 	  		
 	  		pointer.selectAll("circle")
 	  				.attr("cy", cy(mydata[currentpos].position))
-	  		
+	  	
 	  		pointer.selectAll("circle")
 	  				.transition()
 	  				.duration(transitionduration)	
 	  				.attr("cx", cx(mydata[currentpos].position))
 	  		
-	  		pointer.select("circle.inner")
+	  		//pointer.select("circle.inner")
 	  				
-	  				.style("fill", function(d){return colour(d.position-1)});
+	  	//			.style("fill", function(d){return colour(d.position-1)});
 	  				
 	  		pointer.selectAll("line")
 	  				.attr("y1", cy(mydata[currentpos].position))
@@ -414,12 +424,10 @@ define(['jquery','d3'], function($,d3){
 	  						.call(drag)
 	  		container
 	  			.append("rect")
-	  			.attr("rx", 8)
-	  			.attr("ry", 8)
 	  			.attr("x", function(d){return 0})
 	  			.attr("y", function(d){return (d.position - 1) * itemheight})
 	  			.attr("width" , function(d){return width-pointerwidth})
-	  			.attr("height", function(d){return itemheight-rectmargin})
+	  			.attr("height", function(d){return itemheight})
 	  			.style("fill", function(d){return colour(d.position - 1)})
 	  			.style("stroke", function(d){return colour(d.position - 1)})
 	  			.style("stroke-width", 3)
@@ -435,24 +443,27 @@ define(['jquery','d3'], function($,d3){
 	  			.attr("y", function(d){return cy(d.position)})
 	  			.attr("x", function(d){return (width-pointerwidth)/2})
 	  			.attr("dy", ".3em")
-	  			.attr("font-size", function(d){return multiplier(d.position-1) * 35 + "px"})
+	  			.attr("dx", ".8em")
+	  			.attr("font-size", function(d){return multiplier(d.position-1) * rankwidth + "px"})
 	  			.text(function(d){return d.value})
 	  						
 	  		
+	
+	  			
 	  		container
 	  			.append("circle")
 	  			.attr("class", "ranking outer")
-	  			.attr("cx", function(d){return 0})
+	  			.attr("cx", rankwidth + 10)
 	  			.attr("cy", function(d){return cy(d.position)})
-	  			.attr("r", function(d){return multiplier(d.position-1) * (itemheight / 2) - 4})
-	  			.style("fill", "#fff")
+	  			.attr("r", function(d){return rankwidth})
+	  			.style("fill", "#2d213a")
 	  			.style("stroke", "#fff" )
-	  			.style("stroke-width", 4)
+	  			.style("stroke-width", 2)
 	  			.style("fill-opacity", 1.0)	
 				.style("stroke-opacity", 1.0)
 	  			
 	  		
-	  		container
+	  		/*container
 						.append("circle")
 						.attr("class", "ranking inner")
 						.attr("cx", function(d){return 0})
@@ -462,7 +473,7 @@ define(['jquery','d3'], function($,d3){
 						.style("stroke",function(d){return colour(d.position - 1)})
 						.style("stroke-width", 4)
 						.style("fill-opacity", 1.0)	
-						.style("stroke-opacity", 1.0)
+						.style("stroke-opacity", 1.0)*/
 						
 	  		
 	  		
@@ -470,10 +481,11 @@ define(['jquery','d3'], function($,d3){
 	  		container
 	  			.append("text")
 	  			.attr("class", "rank")
-	  			.attr("text-anchor", "middle")
+				.attr("text-anchor", "middle")
+				.attr("x",  rankwidth + 10)
 	  			.attr("y", function(d){return cy(d.position)})
-	  			.attr("dy", ".35em")
-	  			.attr("font-size", function(d){return multiplier(d.position-1) * 35 + "px"})
+	  			.attr("dy", ".3em")
+	  			.attr("font-size", function(d){return multiplier(d.position-1) * rankwidth + "px"})
 	  			.text(function(d){return d.position})
 	  			
 	  				
