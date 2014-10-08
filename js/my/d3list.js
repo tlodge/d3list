@@ -30,7 +30,9 @@ define(['jquery','d3'], function($,d3){
          
         transform = ["", "-webkit-", "-moz-", "-ms-", "-o-"].reduce(function(p, v) { return v + "transform" in document.body.style ? v : p; }) + "transform",
 	  	
-		colours		 = ["#880e4f","#c2185b", "#e91e63", "#f06292", "#f8bbd0"],
+		//colours		 = ["#880e4f","#c2185b", "#e91e63", "#f06292", "#f8bbd0"],
+		
+		colours = ["#9c27b0",  "#5677fc",  "#e91e63",  "#cddc39",  "#ff5722"],
 		
 		mydata = [{position: 1, value: "greggs", comments:['aass nice wwwwww w wwwwww WWWWWWWW  wwwwww w ww ww wwww comment one about greggs which should also go nicely onto a new line and I can say quite a bit too which is good and this makes it all loook terribly nice so there we go and this is a really a a special thing I think','a a a a very much www w ww w ww w nice nicer nicer comment two about greggs and again aaa a a aa and again wwww let us see how far we cab go today and tomorrow and the next etc etc and still we go on and on and on again it']},
 				  {position: 2, value: "birds", comments:['a nice comment one about birds','a nicer comment two about birds']}, 
@@ -95,10 +97,12 @@ define(['jquery','d3'], function($,d3){
 	  		
 	  		draggedcontainer = d3.select("g." +  mydata[startpos].value);
 	   		
-	  		draggedcontainer.select("rect")
-	  			.style("fill", highlighted(startpos))
-	  			.style("stroke", highlighted(startpos));
+	  		//draggedcontainer.select("rect")
+	  		//	.style("fill", highlighted(startpos))
+	  		//	.style("stroke", highlighted(startpos));
 	  		
+	  		//draggedcontainer.select("circle")
+	  		//	.style("fill","#ffeb3b")
 	  		
 	  		//make any previously selected pointers transparent
 	  		var listitems = d3.selectAll("g.listitem");
@@ -114,7 +118,7 @@ define(['jquery','d3'], function($,d3){
 	  	   
 	  				
 	  		//now make the current pointer opaque	
-	  		var pointer = draggedcontainer.select("g")
+	  		/*var pointer = draggedcontainer.select("g")
 	  		
 	  		pointer.selectAll("circle.inner")
 	  			.style("stroke-opacity", 1.0)	
@@ -125,7 +129,7 @@ define(['jquery','d3'], function($,d3){
 	  			.style("fill-opacity", 1.0)	
 	  			
 	  		pointer.selectAll("line")
-	  			.style("stroke-opacity", 1.0)	
+	  			.style("stroke-opacity", 1.0)	*/
 	  			
 	  	},
 	  	
@@ -193,8 +197,8 @@ define(['jquery','d3'], function($,d3){
 					.transition()
 					.duration(transitionduration)
 					.attr("y", y(newpos))
-					.style("fill",colour(newpos-1))	
-					.style("stroke",colour(newpos-1))	
+					//.style("fill",colour(newpos-1))	
+					//.style("stroke",colour(newpos-1))	
 		
 		
 			//these are currently transparent so no point in doing a transition.
@@ -257,12 +261,13 @@ define(['jquery','d3'], function($,d3){
 	   		draggedcontainer.select("rect")
 	  				.attr("y", y(mydata[currentpos].position))	
 	  		
-	  		draggedcontainer.select("rect")
-	  				.style("fill", colour(currentpos))
-	  				.style("stroke", colour(currentpos));
+	  		//draggedcontainer.select("rect")
+	  				//.style("fill", colour(currentpos))
+	  				//.style("stroke", colour(currentpos));
 	  		
 	  	    draggedcontainer.select("circle")
 	  				.attr("cy", function(d){return cy(mydata[currentpos].position)})
+	  				//.style("fill", "#2d213a")
 	  		/*draggedcontainer.select("circle.outer")
 	  				.attr("r", multiplier(mydata[currentpos].position) * ((height/mydata.length) / 2) - 4)
 	  				
@@ -304,7 +309,8 @@ define(['jquery','d3'], function($,d3){
 	  		svg.selectAll("path.foreground")
 	  					.transition()
 	  					.duration(transitionduration)
-	  					.style("fill", colour(d.position-1));
+	  					.style("fill",  d.colour)
+	  					// colour(d.position-1));
 	  		
 	  		
 	  		svg.selectAll("text.comment1")
@@ -420,19 +426,30 @@ define(['jquery','d3'], function($,d3){
 	  	renderlist = function(){
 	  		
 	  		var itemheight = height/mydata.length;
-	  		var vcenter    = (itemheight / 2) - rectmargin/2;
-	  		
-	  		
+	  		var titlebarheight = 80;
 	  			
-	  		svg
+	  		titlebar = svg
 	  			.append("g")
+	  			
+	  			
+	  		titlebar
 	  			.append("rect")
 	  			.attr("class","titlebar")
 	  			.attr("x", 0)
 	  			.attr("y", -margin.top)
 	  			.attr("width" , (width-pointerwidth)+commentwidth+5)
-	  			.attr("height", 80)
+	  			.attr("height", titlebarheight)
 	  			.style("fill", "#262238")
+	  		
+	  		titlebar
+	  			.append("text")
+	  			.attr("class", "titletext")
+	  			.attr("text-anchor", "middle")
+	  			.attr("fill", "white")
+	  			.attr("x",  ((width-pointerwidth)+commentwidth+5)/2)
+	  			.attr("y",  -margin.top + (titlebarheight/2))
+	  			.attr("dy", ".35em")
+	  			.text("best places to buy bread")
 	  			
 	  		var list = svg.selectAll(".mylist")
 	  					.data(mydata)
@@ -456,7 +473,11 @@ define(['jquery','d3'], function($,d3){
 	  			.style("stroke-width", 3)
 	  			.style("fill-opacity", 1.0)	
 				.style("stroke-opacity", 1.0)
-			
+				.each(function(d){
+						d.colour = colour(d.position - 1);
+				})
+				
+				
 	  				
 	  		container
 	  			.append("text")
@@ -484,22 +505,7 @@ define(['jquery','d3'], function($,d3){
 	  			.style("stroke-width", 2)
 	  			.style("fill-opacity", 1.0)	
 				.style("stroke-opacity", 1.0)
-	  			
-	  		
-	  		/*container
-						.append("circle")
-						.attr("class", "ranking inner")
-						.attr("cx", function(d){return 0})
-						.attr("cy", function(d){return cy(d.position)})
-						.attr("r", function(d){return multiplier(d.position-1) * (itemheight / 2) - 7})
-						.style("fill", "#fff")
-						.style("stroke",function(d){return colour(d.position - 1)})
-						.style("stroke-width", 4)
-						.style("fill-opacity", 1.0)	
-						.style("stroke-opacity", 1.0)*/
-						
-	  		
-	  		
+	  				
 	  			
 	  		container
 	  			.append("text")
@@ -513,7 +519,7 @@ define(['jquery','d3'], function($,d3){
 	  			.text(function(d){return d.position})
 	  			
 	  				
-	  		var pointer = container
+	  		/*var pointer = container
 	  			.append("g")
 
 	  		
@@ -546,7 +552,7 @@ define(['jquery','d3'], function($,d3){
 				.attr("x2", function(d){return cx(d.position)  })
 	  			.style("stroke", function(d){return colour(d.position - 1)})
 	  			.style("stroke-width", 3)
-	  			.style("stroke-opacity", 0.0)
+	  			.style("stroke-opacity", 0.0)*/
 	  		
 	  			
 	  	},
