@@ -13,7 +13,7 @@ define(['jquery','d3'], function($,d3){
 		
 		keyspressed  = [],
 		
-		rankwidth 	= 50,
+		
 		
 		pointerpadding = [100, 20,60,80,100],
 		
@@ -21,7 +21,7 @@ define(['jquery','d3'], function($,d3){
 		
 		draggedcontainer,
 		
-		commentwidth = 574,
+		//commentwidth = 574,
 		
 		overlayflag   = false,
 		
@@ -58,17 +58,23 @@ define(['jquery','d3'], function($,d3){
 				  
 		margin    = {top:0, right:0, bottom:0,left:0},
 		
-		width 	  = 450 - margin.left - margin.right,
+		//width 	    = 450 - margin.left - margin.right,
+		
+		width		= 1024,
+		
+		rectwidth   = (9/20) * width,
+		
+		rankwidth 	= 50,
 		
 		// iPad mini landscape height = 806px
 	  	height    = 768 - margin.top - margin.bottom,
 		
-		bubblemargin = {top:0, left: width, right:0, bottom:0},
+		bubblemargin = {top:0, left: width-rectwidth, right:0, bottom:0},
 		
 		topbarheight = 80,
 	  	
 	  	svg  = d3.select("#list").append("svg")
-				.attr("width", width + commentwidth + margin.left + margin.right)
+				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")"),
@@ -91,7 +97,7 @@ define(['jquery','d3'], function($,d3){
 	  	
 	  
 	  	cx = function(position){
-	  		return width +  (rectheight / 2);
+	  		return rectwidth +  (rectheight / 2);
 	  	},
 	  
 	  	calcpos = function(ypos){
@@ -326,7 +332,8 @@ define(['jquery','d3'], function($,d3){
 	   					  .on("dragend", togglekeypad),
 	   	
 	   	keypaddrag  = d3.behavior.drag().on("dragstart", keypressed),
-	   					  
+	   	
+	   		  
 	   	
 	   	validateinput = function(){
 	   		keyspressed = [];
@@ -353,8 +360,8 @@ define(['jquery','d3'], function($,d3){
 	   		
 	   		var rectx = 119;
 	   		var recty = 102;
-	   		var rectheight = 85;
-	   		var rectwidth = 294;
+	   		var helprectheight = 85;
+	   		var helprectwidth = 294;
 	   		
 	   		var help = svg.append("g")
 	   					  .attr("class", "help")
@@ -366,8 +373,8 @@ define(['jquery','d3'], function($,d3){
 	   					.attr("rx", 8)
 	   					.attr("x", rectx)
     					.attr("y", recty)
-    					.attr("width", rectwidth)
-    					.attr("height", rectheight)
+    					.attr("width", helprectwidth)
+    					.attr("height", helprectheight)
     					.style("fill", "#045050")
     					.style("stroke", "#fff")
     					.style("stroke-width", 2)
@@ -390,7 +397,7 @@ define(['jquery','d3'], function($,d3){
 	  					.style("font-size", "26px")
 	  					.text(helptext)
 	  					.call(wrap, {
-	  										width: rectwidth-26,
+	  										width: helprectwidth-26,
 	  										padding: 270,
 	  										widths: {},
 	  										paddings: {}
@@ -416,18 +423,11 @@ define(['jquery','d3'], function($,d3){
 	   	},
 	   
 	   		  		  
-	   	togglecommentoverlay = function(){
-	   			
-			overlayflag = !overlayflag;
-			
-			if (overlayflag){
-				showcommentoverlay();
-			}else{
-				hidecommentoverlay();
-			}
-	   	},
-	   	
 	   	hidecommentoverlay = function(){
+	   		
+	   		if (!overlayflag)
+	   			return;
+	   		overlayflag = false;
 	   		
 	   		var overlay = svg.selectAll("g.overlay");
 	   		
@@ -442,31 +442,37 @@ define(['jquery','d3'], function($,d3){
 	   	
 	   	showcommentoverlay = function(){
 	   		
+	   		if (overlayflag){
+	   			return;
+	   		}
 	   		
+	   		overlayflag = true;	
+    		
     		d3.select("body").append("textarea")
     					 .attr("class", "form-control")
     					 .attr("rows", 6)
     					 .style("margin", "20px")
-    					 .style("width",  width+commentwidth-(2*20) + "px") 
+    					 .style("width",  width-(2*20) + "px") 
     					 .style("resize", "none")
     					 .style("font-size", "40px")
     					 .style("opacity", 0.0)
     					 		 
 	   		svg.selectAll("g.overlay").remove();
 	   	
-	   	    overlay = svg.append("g")
+	   	    var overlay = svg.append("g")
 	   						.attr("class", "overlay")
 	   		
 	   		overlay.append("rect")
     					.attr("x", 0)
     					.attr("y", -height/2)
-    					.attr("width", width+commentwidth)
+    					.attr("width", width)
     					.attr("height", height/2.2)
     					.style("fill", "#fff")
     					.style("fill-opacity", 0.95)
     					.style("stroke", "#262238")
     					.style("stroke-width", 2)
-    		
+    					.call(commentoverlaydrag)
+    					
     		d3.select("textarea.form-control")
 	   				.transition()
 	   				.duration(500)
@@ -482,6 +488,11 @@ define(['jquery','d3'], function($,d3){
     						
 	   	},
 	   	
+	   	
+	   	commentdrag = d3.behavior.drag().on("dragstart", showcommentoverlay),
+	   	commentoverlaydrag = d3.behavior.drag().on("dragstart", hidecommentoverlay),	
+	   	
+	   	
 	   	renderbubble = function(){
 	   		
 	   		
@@ -493,9 +504,9 @@ define(['jquery','d3'], function($,d3){
     						
     			
     			comments.append("rect")
-    					.attr("x", -119)
+    					.attr("x", rectwidth - (120+bubblemargin.left))
     					.attr("y", 980)
-    					.attr("width", commentwidth)
+    					.attr("width", width-rectwidth)
     					.attr("height", height)
     					.style("fill", "#262238")
     					.style("fill-opacity", 0.8)
@@ -603,7 +614,7 @@ define(['jquery','d3'], function($,d3){
 	   					.attr("fill", "#262238")
 	   					.attr("stroke", "white")
 	   					.attr("stroke-width", "2px")
-	   					.on("click", togglecommentoverlay)
+	   					
 	   			
 	   			comments
     					.append("text")
@@ -614,7 +625,7 @@ define(['jquery','d3'], function($,d3){
 	   					.attr("font-size", "40px")
 	   					.text("+")
 	   					.attr("fill", "white")
-	   					.on("click", togglecommentoverlay)
+	   					
 	   			
 	   			comments
     					.append("text")
@@ -625,7 +636,16 @@ define(['jquery','d3'], function($,d3){
 	   					.attr("font-size", "20px")
 	   					.text("add comment")
 	   					.attr("fill", "white")	
-	   					.on("click", togglecommentoverlay)	
+	   			
+	   			//transparent circle to increase hit size		
+	   			comments
+    					.append("circle")
+    					.attr("class", "addcomment")
+	   					.attr("cx", 30)
+	   					.attr("cy", 1430)
+	   					.attr("r",50)
+	   					.style("opacity", 0.0)	   					
+	   					.call(commentdrag)	
 	   					
 	   	},
 	    
@@ -639,7 +659,7 @@ define(['jquery','d3'], function($,d3){
 	   					.attr("class", "authrect")
     					.attr("x", 0)
     					.attr("y", 0)
-    					.attr("width", width+commentwidth)
+    					.attr("width", width)
     					.attr("height", height)
     					.style("fill", "#fff")
     					.style("fill-opacity", 0.0)
@@ -704,7 +724,7 @@ define(['jquery','d3'], function($,d3){
 	  			.attr("class","titlebar")
 	  			.attr("x", 0)
 	  			.attr("y", 0)
-	  			.attr("width" , width+commentwidth)
+	  			.attr("width" , width)
 	  			.attr("height", topbarheight)
 	  			.style("fill", "#262238")
 	  		
@@ -713,7 +733,7 @@ define(['jquery','d3'], function($,d3){
 	  			.attr("class", "titletext")
 	  			.attr("text-anchor", "middle")
 	  			.attr("fill", "white")
-	  			.attr("x",  (width+commentwidth)/2)
+	  			.attr("x",  (width)/2)
 	  			.attr("y",  (topbarheight/2))
 	  			.attr("dy", ".35em")
 	  			.text("best places to buy bread")
@@ -733,7 +753,7 @@ define(['jquery','d3'], function($,d3){
 	  			.append("rect")
 	  			.attr("x", function(d){return 0})
 	  			.attr("y", function(d){return ry(d.position)})
-	  			.attr("width" , function(d){return width})
+	  			.attr("width" , function(d){return rectwidth})
 	  			.attr("height", function(d){return rectheight})
 	  			.style("fill", function(d){return colour(d.position - 1)})
 	  			.style("stroke", function(d){return colour(d.position - 1)})
@@ -752,7 +772,7 @@ define(['jquery','d3'], function($,d3){
 	  			.attr("text-anchor", "middle")
 	  			.attr("fill", "white")
 	  			.attr("y", function(d){return cy(d.position)})
-	  			.attr("x", function(d){return (width)/2})
+	  			.attr("x", function(d){return (rectwidth)/2})
 	  			.attr("dy", ".3em")
 	  			.attr("dx", ".8em")
 	  			.attr("font-size", function(d){return multiplier(d.position-1) * rankwidth + "px"})
@@ -783,48 +803,13 @@ define(['jquery','d3'], function($,d3){
 	  			.attr("dy", ".4em")
 	  			.style("fill", "white")
 	  			.attr("font-size", function(d){return multiplier(d.position-1) * rankwidth + "px"})
-	  			.text(function(d){return d.position})
-	  			
-	  				
-	  		/*var pointer = container
-	  			.append("g")
-
-	  		
-	  		pointer.append("circle")
-	  			.attr("class", "outer")
-	  			.attr("cx", function(d){return cx(d.position)})//return width + pointerwidth - (itemheight / 2) })
-	  			.attr("cy", function(d){return cy(d.position)})
-	  			.attr("r", function(d){return ((height/mydata.length) / 2)})
-	  			.style("fill", "#262238")
-	  			.style("stroke", "#fff")
-	  			.style("stroke-width", 4)
-	  			.style("stroke-opacity", 0.0)	
-	  			.style("fill-opacity", 0.0)	
-	  			
-	  		pointer.append("circle")
-	  			.attr("class", "inner")
-	  			.attr("cx", function(d){return cx(d.position)})//width + pointerwidth - ((height/mydata.length) / 2) })
-	  			.attr("cy", function(d){return cy(d.position)})
-	  			.attr("r", function(d){return ((height/mydata.length) / 4)})
-	  			.style("fill", function(d){return colour(d.position - 1)})
-	  			.style("stroke", "#fff")
-	  			.style("stroke-width", 8)
-	  			.style("stroke-opacity", 0.0)	
-	  			.style("fill-opacity", 0.0)	
-	  		
-	  		pointer.append("line")
-	  			.attr("y1", function(d){return cy(d.position)})
-				.attr("x1", function(d){return width - pointerwidth})
-				.attr("y2", function(d){return cy(d.position)})
-				.attr("x2", function(d){return cx(d.position)  })
-	  			.style("stroke", function(d){return colour(d.position - 1)})
-	  			.style("stroke-width", 3)
-	  			.style("stroke-opacity", 0.0)*/
-	  		
-	  			
+	  			.text(function(d){return d.position})	
 	  	},
 	  	
 	
+	  	resize = function(){
+	  		console.log("resizing!!");
+	  	},
 	  	
 	  	wrap = function(text, options){
 	  		
@@ -866,6 +851,9 @@ define(['jquery','d3'], function($,d3){
 		
 		
 	  	init = function(){
+	  		console.log($(window).height(),$(window).width())
+	  		console.log($(document).height(),$(document).width())
+	  		d3.select(window).on('resize', resize);
 	  		renderbubble();	
 			renderlist();
 			renderauth();
