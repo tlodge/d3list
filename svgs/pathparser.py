@@ -4,7 +4,6 @@ from re import split
 from re import sub
 
 class PathIterator:
-	EOI = 'End of Iteration'
 	PATH_IDENTIFIERS = r'[MLHVCSQTAmlhvcsqa]'
 	NUMBERS = r'[0-9.-^A-z]'
 	SEPERATORS = r'\s|\,'
