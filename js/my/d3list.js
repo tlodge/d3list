@@ -39,6 +39,7 @@ define(['jquery','d3'], function($,d3){
 		helphand = "m 73.222939,186.77729 -8.81248,-21.0859 c -15.07784,-5.2247 -30.15567,-12.6427 -45.23351,-19.2242 -5.96806,-12.5023 -11.4965704,-25.0922 -15.8317204,-39.5793 1.41613,-10.8284 3.82803,-20.8881 10.1775104,-29.9671 7.82983,-1.5338 11.82762,2.0255 12.43925,6.2196 l 0.84808,21.2031 c 5.03434,3.3479 9.09714,8.9116 13.85273,11.0257 5.50212,-5.6125 2.86161,-17.2522 1.69632,-26.5746 l -15.26631,-43.5372 c 0,0 -12.0056,-17.8188 -14.13548,-29.6845 -2.40118,-13.3771 14.33867,-14.5238 18.65887,-8.1986 6.07313,8.1239 12.31969,15.874 17.24529,26.0092 l 18.65878,42.1237 c 0,0 -14.67618,-31.1068 -11.30842,-40.7102 2.28972,-6.5292 13.0927,-6.3454 14.98357,-3.1097 10.22908,18.6809 5.0736,13.0386 17.24529,38.1657 0,0 -14.69154,-24.4991 -10.74293,-33.3596 3.92335,-8.8039 15.96294,-6.0035 19.78961,1.4135 l 11.591081,28.8363 c 0,0 -7.60008,-16.9604 -2.5444,-22.6167 2.44916,-2.7402 8.34661,-3.0667 11.02567,0 7.10536,12.0906 12.87184,24.8505 16.96254,38.4484 3.94774,21.3569 3.27038,41.1721 2.82707,61.0653 3.39256,17.469 5.98541,33.1044 9.37797,43.1371 z",
 	    
 bbottom = {'path': [{'xcomp': [0.0], 'type': 'M', 'ycomp': [31.613400000000183]}, {'xcomp': [201.876972, 392.8574, 573.56946], 'type': 'C', 'ycomp': [24.094400000000178, 47.43180000000007, 0.0]}, {'xcomp': [573.56946, 0.0], 'type': 'L', 'ycomp': [136.11860000000001, 136.11860000000001]}], 'height': 136.11860000000001, 'width': 573.56946} ,
+
 blarge = {'path': [{'xcomp': [156.738568], 'type': 'M', 'ycomp': [452.75023999999985]}, {'xcomp': [132.8802729, 137.16946149999998, 118.38488, 99.600297, 0.0, 11.458370000000002, 22.91677, 101.786608, 186.897777, 272.00904, 397.30495, 460.88514, 524.46534, 492.19417, 437.99656, 384.73797, 269.86482, 221.78815600000001, 173.711582, 165.011148, 156.738568], 'type': 'C', 'ycomp': [406.4883399999999, 344.2373399999999, 342.3896399999999, 340.54214, 275.64014, 195.2364399999999, 114.83253999999988, 52.2346399999999, 26.117419999999925, 0.0, 15.396209999999996, 93.10303999999996, 170.81024000000002, 249.61893999999984, 295.38074000000006, 340.3496399999999, 363.91184, 368.4592399999999, 373.0063399999999, 408.15603999999985, 452.75023999999985]}], 'height': 452.75023999999985, 'width': 524.46534} ,
 bsmall = {'path': [{'xcomp': [299.33981], 'type': 'M', 'ycomp': [303.69550000000004]}, {'xcomp': [314.96735, 307.25325000000004, 329.74795, 352.24261, 409.70351, 396.14463, 382.58578, 318.21098, 251.18653, 184.16194000000002, 88.66837000000001, 44.334246, 0.0, 29.478119, 73.87679, 117.50622000000001, 207.27870000000001, 244.53667000000002, 281.79476, 296.3636, 299.33981], 'type': 'C', 'ycomp': [269.41790000000015, 258.7768000000001, 248.6975, 238.61820000000012, 195.93540000000007, 137.42100000000005, 78.90660000000003, 34.75199999999995, 17.3759, 0.0, 13.759300000000167, 71.80709999999999, 129.8547000000001, 186.78660000000013, 219.13490000000002, 250.92250000000013, 265.83540000000016, 268.1943000000001, 270.55330000000004, 269.31449999999995, 303.69550000000004]}], 'height': 303.69550000000004, 'width': 409.70351} ,
 largebubble = {'path': [{'xcomp': [138.87949], 'type': 'M', 'ycomp': [413.50418]}, {'xcomp': [116.8552596, 128.7382106, 100.830995, 72.92386499999999, 0.0, 10.57750999999999, 21.155124999999998, 93.96201299999998, 172.530465, 251.09899, 366.76306999999997, 425.45568, 484.14831, 454.35792, 404.32661, 355.16211999999996, 249.11956, 204.738713, 160.35787599999998, 139.119542, 138.87949], 'type': 'C', 'ycomp': [373.7891800000001, 307.1895800000001, 296.05797999999993, 284.92618000000004, 236.63317999999992, 167.60757999999998, 98.58208000000002, 44.84278000000006, 22.42138, 0.0, 13.217489999999998, 79.92757999999992, 146.6378800000001, 214.29437999999993, 253.5799800000001, 292.18538, 312.4132800000001, 316.31697999999994, 320.22078, 373.09957999999995, 413.50418]}], 'height': 413.50418, 'width': 484.14831} ,
@@ -60,7 +61,7 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 		
 		//width 	    = 450 - margin.left - margin.right,
 		
-		width		= $(document).width(),
+		width		= $(document).width() - margin.left-margin.right,
 		
 		rectwidth   = (9/20) * width,
 		
@@ -74,9 +75,11 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 		topbarheight = 80,
 	  	
 	  	svg  = d3.select("#list").append("svg")
-				.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom)
+				.attr("width", "100%")
+				.attr("height", "100%")
+				.attr("viewBox", "0 0 " + width + " " + height)
 				.append("g")
+				
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")"),
 				
   
@@ -139,7 +142,7 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	  		}) + " z";
 	  		
 	  	},
-	  	
+	  
 	  	dragstart = function(d){
 	  		window.clearTimeout(usagetimer);
 	  	
@@ -515,6 +518,12 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	   	commentdrag = d3.behavior.drag().on("dragstart", showcommentoverlay),
 	   	commentoverlaydrag = d3.behavior.drag().on("dragstart", hidecommentoverlay),	
 	   	
+	   	xScaleFactor = function(cwidth, newwidth){
+	   		console.log("cuuernt with is " + cwidth);
+	   		console.log("new witdh is " + newwidth);
+	   		console.log("scaling x by " + parseFloat(newwidth)/parseFloat(cwidth))
+	   		return parseFloat(newwidth)/parseFloat(cwidth);
+	   	},
 	   	
 	   	renderbubble = function(){
 	   		
@@ -533,6 +542,8 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
     					.style("fill", "#262238")
     					.style("fill-opacity", 0.8)
     			
+    			var xtrans = (width-rectwidth) - bbottom.width;
+    			console.log(xtrans);
     			comments
     						.append("path")
     						.attr("class", "commentfooter")
@@ -540,7 +551,9 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
     					  	.style("stroke-width", 2)
     					  	.style("stroke", "#fff")
     					  	.style("fill", "#262238")
-    					  	.attr("transform", "translate(" + rectwidth + "," +  (height-bbottom.height) + ")");			
+    					  	.attr("transform", "translate(" + rectwidth + "," +  (height-bbottom.height) + "),"  + "scale(" + 	xScaleFactor(bbottom.width, (width-rectwidth)) + ",1.0)" )
+    					  			
+    						
     			
     			
     			comments
@@ -836,8 +849,36 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	  	},
 	  	
 	
-	  	resize = function(){
+	  	resize = function(x){
 	  		console.log("resizing!!");
+	  		resizeall();
+	  	},
+	  	
+	  	resizeall = function(){
+	  	/*	var newwidth  = $(window).width() - margin.left-margin.right;
+	  		var newheight = $(window).height() - margin.top - margin.bottom;
+	  		var scaleX = 0.0;
+	  		var scaleY = 0.0;
+	  		
+	  		scaleX = parseFloat(newwidth)/width;
+	  		scaleY = parseFloat(newheight)/height;
+	  			
+	  		
+	  		console.log("scale x is " + scaleX);
+	  		console.log("scale y is " + scaleY);
+	  		
+	  		var overall = d3.select("svg")
+	  		
+	  		var topcontainer = overall.select("g");
+	  		width = newwidth;
+	  		height = newheight;
+	  		
+	  		//topcontainer
+	  		//	.attr("transform", "scale(" + scaleX + "," + scaleY + ")")
+	  		
+	  		overall
+	  			.attr("width", width) 
+	  			.attr("height", height)	*/
 	  	},
 	  	
 	  	wrap = function(text, options){
@@ -884,10 +925,10 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	  		console.log($(document).height(),$(document).width())
 	  		d3.select(window).on('resize', resize);
 	  		
-	  		renderbubble();	
+	  		
 			renderlist();
 			renderauth();
-			
+			renderbubble();	
 	  	}
 
 	return {
