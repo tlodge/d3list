@@ -1,8 +1,10 @@
-define(['jquery','d3'], function($,d3){
+define(['jquery','d3', 'util', 'auth'], function($,d3,util,auth){
 
 	"use strict";
 	var 
 	
+		
+	  	
 		startpos   = 0,
 		
 		rectmargin = 30,
@@ -72,7 +74,7 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 		
 		bubblemargin = {top:0, left: width-rectwidth, right:0, bottom:0},
 		
-		topbarheight = 80,
+		topbarheight = height/6,
 	  	
 	  	svg  = d3.select("#list").append("svg")
 				.attr("width", "100%")
@@ -128,22 +130,9 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	  		return 1;//0.7 + (0.3 * (1 - (ypos/mydata.length)));
 	  	},
 	  	
-	  	
-	  	generatepath = function(pobj){
-	  		return pobj.path.map(function(x){
-	  			
-	  			var xpath = $.map(x['xcomp'], function(v,i){
-	  				return [v, x['ycomp'][i]]
-	  			});
-	  		
-	  			return x.type + " " + xpath.join();
-	  		}).reduce(function(x,y){
-	  			return x + " " + y;
-	  		}) + " z";
-	  		
-	  	},
 	  
 	  	dragstart = function(d){
+	  		keypressed = [];
 	  		window.clearTimeout(usagetimer);
 	  	
 	  		d3.event.sourceEvent.stopPropagation();
@@ -252,8 +241,11 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	   	
 	   	dragend = function(d,i){
 	   		
+	   		console.log("drag end!!");
 	   		if (!dragging)
 	   			return;
+	   			
+	   		console.log("and am here!");
 	   		//reset translation to 0 and update the x,y coords.  We do a translate as its the only
 	   		//way of shifting a svg group (g) element. And is more efficient than shifting each 
 	   		//component that makes up a group element.
@@ -362,17 +354,27 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	   		  
 	   	
 	   	validateinput = function(){
-	   		keyspressed = [];
 	   		
+	   		var authenticated = auth.authenticate(keyspressed);
 	   		
-	   		svg.selectAll('g.authoverlay')
+	   		if (authenticated){
+	   			keyspressed = [];
+	   			
+	   			d3.select("circle.logout")
+	  				.style("fill-opacity", 0.2)
+	  				.style("stroke-opacity", 1.0)
+	   		
+	   			
+	   		
+	   			svg.selectAll('g.authoverlay')
 	   				.transition()
 	   				.each("end", function(){svg.selectAll('g.authoverlay').remove();showhelp();})
 	   				.duration(500)
 	   				.style("opacity", 0.0)
-	   				
-	   				
-	   		usagetimer = window.setTimeout(renderauth, usagetimeout);
+	   		
+	   			svg.select()
+	   			usagetimer = window.setTimeout(renderauth, usagetimeout);
+	   		}
 	   	},
 	   	
 	   	
@@ -527,8 +529,65 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	   	
 	   	renderbubble = function(){
 	   		
+	   		var x0 	  	 = rectwidth;		
+	   		var y0 	  	 = topbarheight;
+	   		var cwidth 	 = width - rectwidth;
+	   		var cheight  = height-topbarheight;
+	   		var commentcircleradius = 30;
 	   		
-	   					
+	   		//create the paths to fit the space.
+	   		var sfx = cwidth/bbottom.width;
+	   		var sfy = (cheight/bbottom.height)/5;
+	   		
+	   		var cfooterpath = util.transformpath(bbottom, 
+    						  {
+    								scalex:sfx,
+    								scaley:sfy, 
+    								transx:x0, 
+    								transy: cheight
+    						   });
+	   		
+	   		//scale factor is calculated as the amount required to turn the large shadow into 3/4 the size of the 
+	   		//available space (width or height, whichever is smallest);
+	   		
+	   		sfx = Math.min((cwidth*(3/4)) / blarge.width, (cheight*(3/4)) / blarge.height);
+	   		
+	   		var shadowlarge =	 util.transformpath(blarge, 
+								{
+    								scalex: sfx,
+    								scaley: sfx, 
+    								transx: (x0 + cwidth/2) - (sfx*(blarge.width/1.6)), 
+    								transy: (y0 + (cheight/2) - (sfx*(blarge.height/1.5)))
+    							});
+    							
+			
+	   		var shadowsmall	= util.transformpath(bsmall, 
+								{
+    								scalex: sfx,
+    								scaley: sfx, 
+    								transx: (x0 + cwidth/2) - (sfx*(bsmall.width/3.3)), 
+    								transy: (y0 + (cheight/2) - (sfx*(bsmall.height/3)))
+    							}
+							);	
+	   		
+	   		var bubblelarge = util.transformpath(largebubble, 
+								{
+    								scalex: sfx,
+    								scaley: sfx, 
+    								transx: (x0 + cwidth/2) - (sfx*(largebubble.width/1.6)), 
+    								transy: (y0 + (cheight/2) - (sfx*(largebubble.height/1.5)))
+    							}
+							);				
+			
+			var bubblesmall = util.transformpath(smallbubble, 
+								{
+    								scalex: sfx,
+    								scaley: sfx, 
+    								transx: (x0 + cwidth/2) - (sfx*(smallbubble.width/3.6)), 
+    								transy: (y0 + (cheight/2) - (sfx*(smallbubble.height/3.6)))
+    							}
+							);	
+							
 	   		var comments = svg
     						.append("g")
     						.attr("class", "comments")
@@ -541,57 +600,50 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
     					.attr("height", height-topbarheight)
     					.style("fill", "#262238")
     					.style("fill-opacity", 0.8)
+    					
     			
-    			var xtrans = (width-rectwidth) - bbottom.width;
-    			console.log(xtrans);
     			comments
     						.append("path")
     						.attr("class", "commentfooter")
-    						.attr("d", generatepath(bbottom))
+    						.attr("d", util.generatepath(cfooterpath))
     					  	.style("stroke-width", 2)
     					  	.style("stroke", "#fff")
     					  	.style("fill", "#262238")
-    					  	.attr("transform", "translate(" + rectwidth + "," +  (height-bbottom.height) + "),"  + "scale(" + 	xScaleFactor(bbottom.width, (width-rectwidth)) + ",1.0)" )
     					  			
-    						
-    			
-    			
     			comments
-					.append("path")
-					.attr("class", "bubbleback")
-					.attr("d", generatepath(blarge))
-					.style("stroke-width", 10)
-					.style("stroke", "#262238")
-					.style("fill", "#262238")
-					.attr("transform", "translate(" + commentxpos(blarge.width,0.5) + "," + commentypos(blarge.height,0.35) + ")");
-								
+							.append("path")
+							.attr("class", "bubbleback")
+							.attr("d", util.generatepath(shadowlarge))
+							.style("stroke-width", 10)
+							.style("stroke", "#262238")
+							.style("fill", "#262238")			
+							
     			comments
-					.append("path")
-					.attr("class", "bubbleback")
-					.attr("d", generatepath(bsmall))
-					.style("stroke-width", 10)
-					.style("stroke", "#262238")
-					.style("fill", "#262238")	
-					.attr("transform", "translate(" + commentxpos(bsmall.width,0.6) + "," + commentypos(bsmall.height, 0.55) + ")");
+							.append("path")
+							.attr("class", "bubbleback")
+							.attr("d", util.generatepath(shadowsmall))
+							.style("stroke-width", 10)
+							.style("stroke", "#262238")
+							.style("fill", "#262238")	
+					
     						
     			comments
-					.append("path")
-					.attr("class", "foreground")
-					.attr("d", generatepath(largebubble))
-					.style("stroke-width", 2)
-					.style("stroke", "#fff")
-					.style("fill", colour(0))		
-					.attr("transform", "translate(" + commentxpos(largebubble.width,0.5) + "," + commentypos(largebubble.height,0.35) + ")");
-								
-    			comments
-					.append("path")
-					.attr("class", "foreground")
-					.attr("d", generatepath(smallbubble))
-					.style("stroke-width", 2)
-					.style("stroke", "#fff")
-					.style("fill", colour(0))	
-					.attr("transform", "translate(" + commentxpos(smallbubble.width,0.6) + "," + commentypos(smallbubble.height, 0.55) + ")");
+							.append("path")
+							.attr("class", "foreground")
+							.attr("d", util.generatepath(bubblelarge))	
+							.style("stroke-width", 2)
+							.style("stroke", "#fff")
+							.style("fill", colour(0))						
 				
+    			comments
+							.append("path")
+							.attr("class", "foreground")
+							.attr("d", util.generatepath(bubblesmall))
+							.style("stroke-width", 2)
+							.style("stroke", "#fff")
+							.style("fill", colour(0))	
+					
+				/*
 				comments
 					.append("g")
 					.attr("width", 300)
@@ -646,13 +698,14 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 					.attr("width", 560)
 					.attr("height",83)
     			
+    			*/
     			
     			comments
 					.append("circle")
 					.attr("class", "addcomment")
-					.attr("cx", 30)
-					.attr("cy", 1430)
-					.attr("r",30)
+					.attr("cx", bubblelarge.minx + (bubblelarge.width * (4/15)) )
+					.attr("cy", bubblelarge.maxy)
+					.attr("r", commentcircleradius* sfx)
 					.attr("fill", "#262238")
 					.attr("stroke", "white")
 					.attr("stroke-width", "2px")
@@ -661,8 +714,8 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	   			comments
 					.append("text")
 					.attr("text-anchor", "middle")
-					.attr("x", 30)
-					.attr("y", 1430)
+					.attr("x", bubblelarge.minx + (bubblelarge.width * (4/15)) )
+					.attr("y", bubblelarge.maxy)
 					.attr("dy", ".35em")
 					.attr("font-size", "40px")
 					.text("+")
@@ -672,8 +725,8 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	   			comments
 					.append("text")
 					.attr("text-anchor", "middle")
-					.attr("x", 30)
-					.attr("y", 1480)
+					.attr("x", bubblelarge.minx + (bubblelarge.width * (4/15)) )
+					.attr("y",  bubblelarge.maxy + 1.5*(commentcircleradius* sfx))
 					.attr("dy", ".35em")
 					.attr("font-size", "20px")
 					.text("add comment")
@@ -691,9 +744,12 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	   					
 	   	},
 	    
+	    
+	    //auth overlay / keypad etc should sit in the auth module!
 	    renderauth = function(){
 	     	
-
+			window.clearTimeout(usagetimer);
+			keyspressed = [];
 	     	var overlay = svg.append("g")
 	   					 .attr("class", "authoverlay")	
 	   		
@@ -709,11 +765,23 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
     					
 	    },
 	    
+	    keyx = function(i, keyradius, keypadding){
+	    	var keypadwidth = (2 * keypadding) +  (3 * keyradius);
+	    	var offset = (width/2) - keypadwidth/2; 
+	    	return offset + ((i%3) * ((2*keyradius)+keypadding));
+	    },
 	    
+	    keyy = function(i, keyradius, keypadding){
+	    	var keypadheight = (3 * keypadding) + (4 * keyradius);
+	    	var offset = (height/2) - keypadheight/2; 
+	    	return offset + (parseInt(i/3) * ((2*keyradius)+keypadding));
+	    },
 	    
 	    renderkeypad = function(){
 	    	keyspressed = [];
 	    	var keyradius = 40;
+	    	var keypadding = 20;
+	    	
 	    	var keys = [1,2,3,4,5,6,7,8,9,0];
 	    	
 	    	var mykeypad = svg.selectAll('g.authoverlay')
@@ -724,12 +792,12 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	        
 	        var akey = mykeypad.enter()
 	       
-	     
+	     	//add an on click and preventdefault here (as done with floors in building)
 	        akey
 				.append("circle")
 				.attr("class", function(d){return "keypad key-" + d})
-				.attr("cx", function(d,i){return 400 + (((i)%3) * ((2*keyradius)+20))})
-				.attr("cy", function(d,i){return 200 + (parseInt((i)/3) * ((2*keyradius)+20))})
+				.attr("cx", function(d,i){return keyx(i,keyradius, keypadding)})
+				.attr("cy", function(d,i){return keyy(i,keyradius, keypadding)})
 				.attr("r", keyradius)
 				.style("fill", "#fff")
 				.style("fill-opacity", 0.7)
@@ -739,8 +807,8 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	    	
 	    	akey
 				.append("text")
-				.attr("x", function(d,i){return 400 + (((i)%3) * ((2*keyradius)+20))})
-				.attr("y", function(d,i){return 200 + (parseInt((i)/3) * ((2*keyradius)+20))})
+				.attr("x", function(d,i){return keyx(i,keyradius, keypadding)})
+				.attr("y", function(d,i){return keyy(i,keyradius, keypadding)})
 				.attr("text-anchor", "middle")
 				.attr("dy", ".35em")
 				.attr("font-size", "40px")
@@ -759,7 +827,7 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 					  			
 	  		var titlebar = svg
 	  			.append("g")
-	  			
+	  			.attr("class", "titlebar")
 	  			
 	  		titlebar
 	  			.append("rect")
@@ -779,7 +847,24 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 	  			.attr("y",  (topbarheight/2))
 	  			.attr("dy", ".35em")
 	  			.text("best places to buy bread")
-	  			
+	  		
+	  		titlebar
+	  			.append("circle")
+	  			.attr("class", "logout")
+	  			.attr("cx", width - 30*2)
+	  			.attr("cy", topbarheight/2)
+	  			.attr("r", 30)
+	  			.style("fill", "white")
+	  			.style("fill-opacity", 0.0)
+	  			.style("stroke", "white")
+	  			.style("stroke-width", 2)
+	  			.style("stroke-opacity", 0.0)
+	  			.on("click", function(){
+	  										d3.select(this).style("fill-opacity",0.0);
+	  										d3.select(this).style("stroke-opacity",0.0);
+	  										renderauth();	
+	  									})
+	  				
 	  		var list = svg.selectAll(".mylist")
 	  					.data(mydata)
 	  			
@@ -921,14 +1006,16 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
 		
 		
 	  	init = function(){
+	  		
+	  		
+	  	
 	  		console.log($(window).height(),$(window).width())
 	  		console.log($(document).height(),$(document).width())
-	  		d3.select(window).on('resize', resize);
-	  		
-	  		
+	  		d3.select(window).on('resize', resize);	
 			renderlist();
-			renderauth();
 			renderbubble();	
+			renderauth();
+				
 	  	}
 
 	return {
