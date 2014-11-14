@@ -700,6 +700,9 @@ smallbubble = {'path': [{'xcomp': [269.783336], 'type': 'M', 'ycomp': [252.73800
     			
     			*/
     			
+    			console.log("bubble large is");
+    			console.log(bubblelarge);
+    			
     			comments
 					.append("circle")
 					.attr("class", "addcomment")
